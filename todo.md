@@ -1,0 +1,176 @@
+# Puppeteer MCP 服务开发任务清单
+
+## 阶段一：设计与规划 (当前)
+
+### 1. 服务架构设计
+- [ ] **确定 Web 框架**: 选择 Flask 或 FastAPI 作为基础 Web 框架，用于处理 HTTP/JSON-RPC 2.0 请求。
+- [ ] **核心浏览器管理模块**: 设计一个模块负责 Playwright 浏览器的启动、关闭、上下文管理和页面管理。
+- [ ] **请求处理逻辑**: 定义 JSON-RPC 请求的解析、分发到对应浏览器操作的逻辑。
+- [ ] **错误处理机制**: 设计统一的错误响应格式，符合 JSON-RPC 规范。
+- [ ] **并发模型**: 考虑如何处理并发请求，例如使用异步操作 (async/await) 配合 Playwright 的异步 API。
+
+### 2. 配置方案设计
+- [ ] **定义配置文件格式**: 采用 JSON 格式作为配置文件 (e.g., `config.json`)。
+- [ ] **浏览器启动参数**: 允许配置 Playwright 浏览器启动选项，例如：
+    - `browser_type`: (e.g., "chromium", "firefox", "webkit")
+    - `headless`: (true/false)
+    - `user_agent`: (string)
+    - `viewport_size`: ({ "width": number, "height": number })
+    - `slow_mo`: (number, 毫秒)
+    - `proxy`: ({ "server": string, "username": string, "password": string })
+- [ ] **服务配置**: 允许配置服务本身的参数，例如：
+    - `host`: (string, e.g., "0.0.0.0")
+    - `port`: (number, e.g., 8080)
+    - `log_level`: (e.g., "INFO", "DEBUG")
+    - `default_timeout`: (number, 毫秒, 用于页面操作)
+- [ ] **安全性配置**: 考虑 API 密钥或其他认证机制 (可选，根据后续需求)。
+
+### 3. API 接口设计 (JSON-RPC 2.0)
+- [ ] **基础 API 规范**:
+    - 所有请求方法遵循 JSON-RPC 2.0 规范。
+    - `jsonrpc`: "2.0"
+    - `method`: "service.method_name"
+    - `params`: (object or array)
+    - `id`: (string or number)
+- [ ] **核心功能 API**:
+    - **页面导航**: `puppeteer.navigate`
+        - `params`: `{ "url": string, "timeout": number (optional), "wait_until": string (optional, e.g., "load", "domcontentloaded", "networkidle") }`
+        - `returns`: `{ "status": "success" or "error", "message": string (optional) }`
+    - **截屏**: 
+        - `puppeteer.take_page_screenshot`
+            - `params`: `{ "path": string (optional, 保存路径), "full_page": boolean (optional), "type": string (optional, "png" or "jpeg"), "quality": number (optional, for jpeg) }`
+            - `returns`: `{ "status": "success", "image_base64": string (if no path), "file_path": string (if path provided) }`
+        - `puppeteer.take_element_screenshot`
+            - `params`: `{ "selector": string, "path": string (optional), "timeout": number (optional) }`
+            - `returns`: `{ "status": "success", "image_base64": string (if no path), "file_path": string (if path provided) }`
+    - **JavaScript 执行**: `puppeteer.execute_javascript`
+        - `params`: `{ "script": string, "args": array (optional) }`
+        - `returns`: `{ "status": "success", "result": any }`
+    - **获取控制台日志**: `puppeteer.get_console_logs`
+        - `params`: `{ "clear_after_read": boolean (optional, default false) }`
+        - `returns`: `{ "status": "success", "logs": [ { "type": string, "text": string, "timestamp": string } ] }`
+    - **元素交互**: 
+        - `puppeteer.click_element`
+            - `params`: `{ "selector": string, "timeout": number (optional), "button": string (optional, "left", "right", "middle"), "click_count": number (optional, default 1) }`
+            - `returns`: `{ "status": "success" }`
+        - `puppeteer.fill_form_field`
+            - `params`: `{ "selector": string, "value": string, "timeout": number (optional) }`
+            - `returns`: `{ "status": "success" }`
+        - `puppeteer.get_element_text`
+            - `params`: `{ "selector": string, "timeout": number (optional) }`
+            - `returns`: `{ "status": "success", "text": string }`
+        - `puppeteer.get_element_html`
+            - `params`: `{ "selector": string, "timeout": number (optional) }`
+            - `returns`: `{ "status": "success", "html": string }`
+        - `puppeteer.get_page_content`
+            - `params`: `{}`
+            - `returns`: `{ "status": "success", "content": string (HTML content) }`
+        - `puppeteer.get_element_attribute`
+            - `params`: `{ "selector": string, "attribute_name": string, "timeout": number (optional) }`
+            - `returns`: `{ "status": "success", "value": string | null }`
+        - `puppeteer.select_option`
+            - `params`: `{ "selector": string, "value": string | array[string] (value, label, or index), "timeout": number (optional) }`
+            - `returns`: `{ "status": "success" }`
+        - `puppeteer.hover_element`
+            - `params`: `{ "selector": string, "timeout": number (optional) }`
+            - `returns`: `{ "status": "success" }`
+        - `puppeteer.focus_element`
+            - `params`: `{ "selector": string, "timeout": number (optional) }`
+            - `returns`: `{ "status": "success" }`
+        - `puppeteer.type_text`
+            - `params`: `{ "selector": string, "text": string, "delay": number (optional, ms between key presses), "timeout": number (optional) }`
+            - `returns`: `{ "status": "success" }`
+        - `puppeteer.press_key`
+            - `params`: `{ "selector": string (optional, to focus before press), "key": string (e.g., "Enter", "ArrowDown"), "timeout": number (optional) }`
+            - `returns`: `{ "status": "success" }`
+- [ ] **特色功能 API**:
+    - `puppeteer.smart_scroll_and_find`
+        - `params`: `{ "target_selector": string, "max_scrolls": number (optional, default 10), "scroll_delay": number (optional, ms, default 500), "direction": string (optional, "down" or "up", default "down") }`
+        - `returns`: `{ "status": "success", "found": boolean, "element_details": object (if found) }` (element_details could include text, html, attributes)
+    - `puppeteer.extract_structured_data`
+        - `params`: `{ "schema": { "container_selector": string, "item_selector": string, "fields": { "field_name": { "selector": string, "attribute": string (optional, e.g., "href", default is text_content) } } } }`
+        - `returns`: `{ "status": "success", "data": [object] }`
+    - `puppeteer.manage_browser_context` (Advanced: might require more complex state management)
+        - `puppeteer.create_context`
+            - `params`: `{ "context_options": object (Playwright browser context options) }`
+            - `returns`: `{ "status": "success", "context_id": string }`
+        - `puppeteer.switch_context`
+            - `params`: `{ "context_id": string }`
+            - `returns`: `{ "status": "success" }` (all subsequent operations use this context)
+        - `puppeteer.close_context`
+            - `params`: `{ "context_id": string }`
+            - `returns`: `{ "status": "success" }`
+    - `puppeteer.wait_for_navigation`
+        - `params`: `{ "timeout": number (optional), "wait_until": string (optional) }`
+        - `returns`: `{ "status": "success", "url": string (new URL) }`
+    - `puppeteer.wait_for_selector`
+        - `params`: `{ "selector": string, "timeout": number (optional), "state": string (optional, "visible", "hidden", "attached", "detached") }`
+        - `returns`: `{ "status": "success" }`
+    - `puppeteer.get_cookies`
+        - `params`: `{ "urls": array[string] (optional) }`
+        - `returns`: `{ "status": "success", "cookies": array[object] }`
+    - `puppeteer.set_cookies`
+        - `params`: `{ "cookies": array[object] }`
+        - `returns`: `{ "status": "success" }`
+    - `puppeteer.clear_cookies`
+        - `params`: `{}`
+        - `returns`: `{ "status": "success" }`
+    - `puppeteer.set_extra_http_headers`
+        - `params`: `{ "headers": object }`
+        - `returns`: `{ "status": "success" }`
+    - `puppeteer.get_page_title`
+        - `params`: `{}`
+        - `returns`: `{ "status": "success", "title": string }`
+    - `puppeteer.get_current_url`
+        - `params`: `{}`
+        - `returns`: `{ "status": "success", "url": string }`
+
+## 阶段二：开发与实现
+- [ ] **环境搭建**: 确认 Python, Playwright, Flask/FastAPI 已正确安装和配置。
+- [ ] **创建项目结构**: 建立项目文件夹和初始文件。
+- [ ] **实现 Web 服务入口**: 编写 Flask/FastAPI 应用，监听指定端口，接收 JSON-RPC 请求。
+- [ ] **实现配置加载模块**: 编写加载和解析 `config.json` 的功能。
+- [ ] **实现浏览器管理模块**: 编写 Playwright 浏览器实例的启动、关闭、上下文和页面管理逻辑。
+- [ ] **实现核心 API 端点**: 逐个实现 `puppeteer.*` API 方法。
+    - [ ] `puppeteer.navigate`
+    - [ ] `puppeteer.take_page_screenshot`
+    - [ ] `puppeteer.take_element_screenshot`
+    - [ ] `puppeteer.execute_javascript`
+    - [ ] `puppeteer.get_console_logs`
+    - [ ] `puppeteer.click_element`
+    - [ ] `puppeteer.fill_form_field`
+    - [ ] `puppeteer.get_element_text`
+    - [ ] `puppeteer.get_element_html`
+    - [ ] `puppeteer.get_page_content`
+    - [ ] `puppeteer.get_element_attribute`
+    - [ ] `puppeteer.select_option`
+    - [ ] `puppeteer.hover_element`
+    - [ ] `puppeteer.focus_element`
+    - [ ] `puppeteer.type_text`
+    - [ ] `puppeteer.press_key`
+- [ ] **实现特色 API 端点**:
+    - [ ] `puppeteer.smart_scroll_and_find`
+    - [ ] `puppeteer.extract_structured_data`
+    - [ ] `puppeteer.manage_browser_context` (create, switch, close)
+    - [ ] `puppeteer.wait_for_navigation`
+    - [ ] `puppeteer.wait_for_selector`
+    - [ ] `puppeteer.get_cookies`
+    - [ ] `puppeteer.set_cookies`
+    - [ ] `puppeteer.clear_cookies`
+    - [ ] `puppeteer.set_extra_http_headers`
+    - [ ] `puppeteer.get_page_title`
+    - [ ] `puppeteer.get_current_url`
+- [ ] **编写单元测试**: 为每个 API 端点和核心模块编写单元测试。
+- [ ] **编写集成测试**: 测试多个 API 调用组合的场景。
+
+## 阶段三：测试与文档
+- [ ] **执行所有测试**: 确保所有测试用例通过。
+- [ ] **手动测试**: 进行实际场景的手动测试。
+- [ ] **性能测试**: (可选) 对高频使用的 API 进行性能评估。
+- [ ] **编写 README.md**: 包括项目介绍、如何安装、如何配置、API 文档、使用示例。
+- [ ] **编写 API 详细文档**: 为每个 API 端点提供详细的参数说明、返回值说明和示例。
+
+## 阶段四：交付
+- [ ] **打包项目文件**: 将所有代码、配置文件模板、文档打包。
+- [ ] **通知用户**: 向用户交付项目，并提供必要的说明。
+

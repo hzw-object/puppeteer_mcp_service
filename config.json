@@ -1,0 +1,20 @@
+{
+    "browser_type": "chromium",
+    "headless": true,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
+    "viewport_size": {
+        "width": 1280,
+        "height": 720
+    },
+    "slow_mo": 0,
+    "proxy": null,
+    "service": {
+        "host": "0.0.0.0",
+        "port": 8080,
+        "log_level": "INFO",
+        "default_timeout": 30000
+    },
+    "security": {
+        "api_key": null
+    }
+}

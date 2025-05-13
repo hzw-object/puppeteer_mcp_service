@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+playwright
+python-jsonrpc-server  # For a more structured JSON-RPC handling, though FastAPI can do it directly.
+# python-multipart # for form data, if needed for file uploads directly via API, not screenshots
+
