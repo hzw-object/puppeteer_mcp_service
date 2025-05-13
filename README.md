@@ -104,7 +104,7 @@ The service will be available at `http://0.0.0.0:8080`. The JSON-RPC endpoint is
 
 ## 4. API Endpoints (JSON-RPC Methods)
 
-All API methods are invoked by sending a POST request to the `/jsonrpc` endpoint (e.g., `https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc` or `http://localhost:8080/jsonrpc`). The request body must be a JSON-RPC 2.0 object.
+All API methods are invoked by sending a POST request to the `/jsonrpc` endpoint (e.g. `http://localhost:8080/jsonrpc`). The request body must be a JSON-RPC 2.0 object.
 
 **Common Request Structure:**
 ```json
@@ -149,7 +149,7 @@ Navigates the active page to the specified URL.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.navigate", "params": {"url": "http://example.com"}, "id": "nav1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -173,7 +173,7 @@ Retrieves the URL of the active page.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.get_current_url", "params": {}, "id": "geturl1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response** (after navigating to example.com):
     ```json
@@ -196,7 +196,7 @@ Retrieves the title of the active page.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.get_page_title", "params": {}, "id": "gettitle1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response** (after navigating to example.com):
     ```json
@@ -224,7 +224,7 @@ Captures a screenshot of the active page.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.take_page_screenshot", "params": {"path": "/home/ubuntu/puppeteer_mcp_service/example.png"}, "id": "screenfile1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response (Save to File)**:
     ```json
@@ -241,7 +241,7 @@ Captures a screenshot of the active page.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.take_page_screenshot", "params": {"type": "jpeg", "quality": 80}, "id": "screenbase64"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response (Base64)**:
     ```json
@@ -264,7 +264,7 @@ Retrieves the full HTML content of the active page.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.get_page_content", "params": {}, "id": "getcontent1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -291,7 +291,7 @@ Clicks an element specified by a CSS selector.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.click_element", "params": {"selector": "a[href=\"https://www.iana.org/domains/example\"]"}, "id": "click1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -316,7 +316,7 @@ Fills a form field (input, textarea) with the specified value.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.fill_form_field", "params": {"selector": "#searchInput", "value": "Playwright"}, "id": "fill1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -340,7 +340,7 @@ Retrieves the text content of an element specified by a CSS selector.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.get_element_text", "params": {"selector": "h1"}, "id": "gettext1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response** (on example.com):
     ```json
@@ -366,7 +366,7 @@ Retrieves the value of a specified attribute from an element.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.get_element_attribute", "params": {"selector": "a", "attribute_name": "href"}, "id": "getattr1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response** (on example.com, for the first link):
     ```json
@@ -391,7 +391,7 @@ Executes a JavaScript function or expression in the context of the active page.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.execute_javascript", "params": {"script": "() => ({ title: document.title, url: window.location.href })"}, "id": "execjs1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -418,7 +418,7 @@ Creates a new isolated browser context.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.create_context", "params": {"context_options": {"user_agent": "MyCustomAgent/1.0"}}, "id": "createctx1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -442,7 +442,7 @@ Switches the active browser context.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.switch_context", "params": {"context_id": "context_abc123xyz"}, "id": "switchctx1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -467,7 +467,7 @@ Closes a browser context and all its pages.
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.close_context", "params": {"context_id": "context_abc123xyz"}, "id": "closectx1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response**:
     ```json
@@ -491,7 +491,7 @@ Retrieves console log messages from the browser. A full implementation would req
     ```bash
     curl -X POST -H "Content-Type: application/json" \
     -d '{"jsonrpc": "2.0", "method": "puppeteer.get_console_logs", "params": {}, "id": "getlogs1"}' \
-    https://8080-i0k0tkcmavbj2c6d8nvoz-8c2b5b50.manus.computer/jsonrpc
+    http://localhost:8080/jsonrpc
     ```
 -   **Example Success Response (Current Placeholder)**:
     ```json
